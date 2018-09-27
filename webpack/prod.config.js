@@ -1,22 +1,18 @@
-const webpack = require('webpack');
+const merge = require('webpack-merge');
 const path = require('path');
+const baseConfig = require('./base.config.js');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const postcssPresetEnv = require('postcss-preset-env');
 
-module.exports = {
-  mode: 'development',
-  entry: './src/index.js',
+module.exports = merge(baseConfig, {
+  mode: 'production',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'dist')
-  },
-  devServer: {
-    contentBase: './dist',
-    hot: true
+    path: path.resolve(__dirname, '../dist')
   },
   optimization: {
     minimizer: [
@@ -29,7 +25,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(['../dist']),
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html'
@@ -38,20 +34,9 @@ module.exports = {
       filename: '[name].css',
       chunkFilename: '[id].css'
     }),
-    new webpack.HotModuleReplacementPlugin()
   ],
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: 'babel-loader?cacheDirectory=true',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      },
       {
         test: /\.s?css$/,
         use: [
@@ -74,18 +59,7 @@ module.exports = {
           },
           'sass-loader'
         ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif|)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      {
-        test: /\.(woff(2)?|eot|ttf|otf)$/,
-        use: 'file-loader'
       }
     ]
-  },
-  watch: true
-};
+  }
+});
